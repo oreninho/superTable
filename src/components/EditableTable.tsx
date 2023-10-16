@@ -20,10 +20,11 @@
 //sorting - the user should be able to sort the data by a specific column, the user should be able to sort the data by multiple columns??
 //how to add the sorting? on click? on hover? on drag? on button? on blur? on enter? on specific button? on specific click?
 // think of trading view - they have a lot of sorting options
-import React, { useState, useMemo } from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import Header from './Header';
 import Row from './Row';
 import './editTable.scss';
+import {toCamelCase} from "../services/utils";
 
 export interface TableDataProps {
     columns: Array<{
@@ -46,27 +47,44 @@ const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
     const [data, setData] = useState(initialData);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } | null>(null);
 
-    const sortedData = useMemo(() => {
-        if (sortConfig !== null) {
-            return [...data].sort((a, b) => {
-                if (a[sortConfig.key] < b[sortConfig.key]) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (a[sortConfig.key] > b[sortConfig.key]) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return data;
-    }, [data, sortConfig]);
+    // useEffect(() => {
+    //     setData(initialData);
+    //     return () => {
+    //
+    //     }
+    // },[initialData])
+
+    const sortData = useMemo(() => {
+
+        return (data: typeof initialData,sortConfig:{ key: string; direction: string } | null) => {
+            if (sortConfig !== null) {
+                 const sorted = [...data].sort((a, b) => {
+                    if (a[sortConfig.key] < b[sortConfig.key]) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (a[sortConfig.key] > b[sortConfig.key]) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                    console.log(a[sortConfig.key],b[sortConfig.key])
+                    return 0;
+                });
+                setData(sorted);
+                console.log(sorted);
+
+            }
+
+        };
+    }, []);
 
     const requestSort = (key: string) => {
         let direction = 'ascending';
         if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
             direction = 'descending';
         }
+        key = toCamelCase(key);
         setSortConfig({ key, direction });
+        sortData(data,sortConfig);
+
     };
 
     return (
@@ -77,13 +95,13 @@ const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
                     <Header
                         key={column.id}
                         name={column.title}
-                        onRequestSort={() => requestSort(column.title)}
+                        onRequestSort={(key) => requestSort(key)}
                     />
                 ))}
             </tr>
             </thead>
             <tbody>
-            {sortedData.map((row, index) => (
+            {data.map((row, index) => (
                 <Row key={index} data={row} />
             ))}
             </tbody>
