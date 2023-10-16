@@ -1,15 +1,16 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import EditableTable from "./components/EditableTable";
+const data = require('./data/mocked-data.json');
 
 
 
 function App() {
+    console.log(data)
   return (
     <div className="App">
       <header className="App-header">
-      <EditableTable initialData={[]} columns={[]} />
+      <EditableTable initialData={data.rows} columns={data.columns} />
       </header>
     </div>
   );
