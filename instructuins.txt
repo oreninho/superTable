@@ -1,0 +1,33 @@
+Ability to render different data types per column
+◆ Some of the data points will be string, numbers, boolean and selection list
+◆ All of the above types should be supported by the table
+➔ Ability to filter columns
+◆ The user should be able to select somehow the columns he would like to see
+and the ones to hide
+
+➔ Ability to edit data directly from table cells
+◆ The user should be able to write the new data directly into the data cell
+◆ The user should be able to save the data
+➔ Data should be saved locally and persisted across reloads
+➔ The user should be able to search the data
+◆ String that would be searching over all data columns to filter the rows
+➔ The table should have the ability to group rows by its main column
+◆ The rows would be collapsible, grouping multiple rows together that would
+expand and collapse on click
+
+1
+
+JavaScript
+
+Client Side - Assignment 1
+
+And abide by the following requirements:
+● Optimized to render large data sets
+○ It should be possible to feed the table a data set of 2000 rows (or more) with 10
+(or more) columns without being slow
+
+● Be generic enough to be reusable with other data sets with different columns
+○ We will try to feed our own columns and data sets (in the same shape provided
+below) and everything should work as expected
+
+You may add any other feature that you want !
