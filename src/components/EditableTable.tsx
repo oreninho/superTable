@@ -23,7 +23,7 @@
 import React, { useState, useMemo } from 'react';
 import Header from './Header';
 import Row from './Row';
-
+import './editTable.scss';
 
 export interface TableDataProps {
     columns: Array<{
