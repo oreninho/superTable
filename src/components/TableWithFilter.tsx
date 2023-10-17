@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Table from './EditableTable';
+import './filterMenu.scss';
 
+//should I move the interface to a separate file? must it be all the same interface for all relevant tables??
 interface TableWrapperProps {
     initialData: Array<{
         id: string

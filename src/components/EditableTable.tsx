@@ -25,20 +25,9 @@ import Header from './Header';
 import Row from './Row';
 import './editTable.scss';
 import {toCamelCase} from "../services/utils";
+import {TableDataProps} from "./types";
 
-export interface TableDataProps {
-    columns: Array<{
-        id: string
-        ordinalNo: number
-        title: string
-        type: string
-        width?: number
-    }>
-    initialData: Array<{
-        id: string
-        [columnId: string]: any
-    }>
-}
+
 
 
 

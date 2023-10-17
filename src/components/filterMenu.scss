@@ -1,5 +1,13 @@
+
 .filter-menu{
+  background-color: #282c34;
   display: flex;
+  position: absolute;
+    top: 4rem;
+  border-radius: 1rem;
+    //left: calc(20%);
+  z-index: 4;
+    width: 10%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -9,6 +17,7 @@
   margin: 0.5rem;
   padding: 0.5rem;
   border-radius: 0.5rem;
+
   border: 1px solid #009879;
   background-color: #009879;
   color: #ffffff;
