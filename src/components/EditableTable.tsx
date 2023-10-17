@@ -36,6 +36,9 @@ const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
     const [data, setData] = useState(initialData);
     const [sortConfig, setSortConfig] = useState<{ key: string; ascending: boolean } | null>(null);
 
+    useEffect(() => {
+        console.log('basic Table component rendered with data:', initialData);
+    },[initialData]);
     const handleValueChange = (rowIndex: number, columnId: string, newValue: any) => {
         // Create a new array with the updated row
         const newData = data.map((row, index) => {

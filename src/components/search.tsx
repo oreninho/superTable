@@ -3,7 +3,7 @@ import './search.scss';
 
 interface Props {
   onClick?: () => void;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (query:string) => void;
   value?: string;
 }
 
@@ -11,9 +11,11 @@ const Search: React.FC<Props> = ({ onClick,value,onChange }) => {
     const [searchValue,setSearchValue] = useState(value??"");
 
     const onInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(event.target.value);
-        onChange?.(event);
+        const newSearchValue = event.target.value;
+        setSearchValue(newSearchValue)
+        onChange?.(newSearchValue);
     }
+
   return (
       <div className={"search"}>
     {/*<button onClick={onClick}>*/}

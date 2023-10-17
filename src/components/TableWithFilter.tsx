@@ -1,26 +1,18 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Table from './EditableTable';
 import './filterMenu.scss';
+import {TableWithFilterProps} from "./types";
 
 //should I move the interface to a separate file? must it be all the same interface for all relevant tables??
-interface TableWrapperProps {
-    initialData: Array<{
-        id: string
-        [columnId: string]: any
-    }>
-    columns: Array<{
-        id: string
-        ordinalNo: number
-        title: string
-        type: string
-        width?: number
-    }>
-}
 
-const TableWithFilter: React.FC<TableWrapperProps> = ({ initialData, columns }) => {
+
+const TableWithFilter: React.FC<TableWithFilterProps> = ({ initialData, columns }) => {
+
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [visibleColumns, setVisibleColumns] = useState(columns);
-
+    useEffect(() => {
+        console.log('Table component rendered with data:', initialData);
+    }, [initialData]);
     const handleColumnVisibilityChange = (columnId: string, isVisible: boolean) => {
         const newVisibleColumns = isVisible ?
             [...visibleColumns, columns.find(column => column.id === columnId)]

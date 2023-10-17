@@ -8,11 +8,13 @@ const data = require('./data/mocked-data.json');
 
 
 function App() {
+    const [tableData,setTableData] = React.useState(data);
     console.log(data)
+
   return (
     <div className="App">
       <header className="App-header">
-      <TableWithSearch initialData={data.rows} columns={data.columns} />
+      <TableWithSearch initialData={tableData.rows} columns={tableData.columns} />
       </header>
     </div>
   );

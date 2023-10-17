@@ -1,14 +1,19 @@
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useReducer, useState} from "react";
 import {TableWithSearchProps} from "./types";
 import Search from "./search";
 import TableWithFilter from "./TableWithFilter";
+import {debounce} from "lodash";
 
 
 const TableWithSearch: React.FC<TableWithSearchProps> = (props, context) => {
-    const [searchValue,setSearchValue] = useState(""); //todo? search rows or search columns? from my understanding it should be rows
+   // const [searchValue,setSearchValue] = useState(""); //todo? search rows or search columns? from my understanding it should be rows
     const [filteredData,setFilteredData] = useState(props.initialData);
+        const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-
+    useEffect(() => {
+        console.log('Filtered Data updated:', filteredData);
+        forceUpdate(); //todo:temp should be removed
+    }, [filteredData]);
 
 
     const scanRow = (row: any,query:string) => {
@@ -28,25 +33,24 @@ const TableWithSearch: React.FC<TableWithSearchProps> = (props, context) => {
                 }
             }
             catch (e) {
-                console.log(e, row, key,searchValue);
+                console.log(e, row, key,query);
             }
 
         }
         return false;
     }
 
-    const applySearch = (event:React.ChangeEvent) => {
-        const target = event.target as HTMLInputElement;
-        setSearchValue(target.value); //todo: a bit odd, go back to this later
+    const applySearch = debounce ((query:string) => {
         const newFilteredData = filteredData.filter(row =>
-            scanRow(row,searchValue)
+            scanRow(row,query)
         );
         console.log("len b4 and after",newFilteredData.length,filteredData.length);
         setFilteredData(newFilteredData);
-    };
+    }, 100);
+
     return (
         <div>
-            <Search value={searchValue} onChange={applySearch}/>
+            <Search  onChange={applySearch}/>
             <TableWithFilter {...props} initialData={filteredData}></TableWithFilter>
         </div>
     );
