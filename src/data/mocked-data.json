@@ -1,5 +1,6 @@
 {
   "columns": [
+    { "id": "id", "ordinalNo": 0, "title": "ID", "type": "string" },
     { "id": "userId", "ordinalNo": 1, "title": "User ID", "type": "string" },
     { "id": "userName", "ordinalNo": 2, "title": "Username", "type": "string" },
     { "id": "email", "ordinalNo": 3, "title": "Email", "type": "string" },

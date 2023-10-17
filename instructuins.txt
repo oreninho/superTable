@@ -1,3 +1,4 @@
+https://tanstack.com/table/v8/docs/examples/react/editable-data
 Ability to render different data types per column
 ◆ Some of the data points will be string, numbers, boolean and selection list
 ◆ All of the above types should be supported by the table

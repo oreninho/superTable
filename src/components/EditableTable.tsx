@@ -45,44 +45,47 @@ export interface TableDataProps {
 
 const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
     const [data, setData] = useState(initialData);
-    const [sortConfig, setSortConfig] = useState<{ key: string; direction: string } | null>(null);
+    const [sortConfig, setSortConfig] = useState<{ key: string; ascending: boolean } | null>(null);
 
-    // useEffect(() => {
-    //     setData(initialData);
-    //     return () => {
-    //
-    //     }
-    // },[initialData])
+    const handleValueChange = (rowIndex: number, columnId: string, newValue: any) => {
+        // Create a new array with the updated row
+        const newData = data.map((row, index) => {
+            if (index === rowIndex) {
+                return { ...row, [columnId]: newValue };
+            }
+            return row;
+        });
+
+        setData(newData);
+    };
+
 
     const sortData = useMemo(() => {
-
-        return (data: typeof initialData,sortConfig:{ key: string; direction: string } | null) => {
+        return (data: typeof initialData,sortConfig:{ key: string; ascending: boolean } | null) => {
             if (sortConfig !== null) {
                  const sorted = [...data].sort((a, b) => {
                     if (a[sortConfig.key] < b[sortConfig.key]) {
-                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                        return sortConfig.ascending? -1 : 1;
                     }
                     if (a[sortConfig.key] > b[sortConfig.key]) {
-                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                        return !sortConfig.ascending ? 1 : -1;
                     }
                     console.log(a[sortConfig.key],b[sortConfig.key])
                     return 0;
                 });
                 setData(sorted);
                 console.log(sorted);
-
             }
-
         };
     }, []);
 
     const requestSort = (key: string) => {
-        let direction = 'ascending';
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
+        let isAscending = true;
+        if (sortConfig && sortConfig.key === key && sortConfig.ascending) {
+            isAscending = false;
         }
         key = toCamelCase(key);
-        setSortConfig({ key, direction });
+        setSortConfig({ key, ascending:isAscending });
         sortData(data,sortConfig);
 
     };
@@ -101,8 +104,14 @@ const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
             </tr>
             </thead>
             <tbody>
-            {data.map((row, index) => (
-                <Row key={index} data={row} />
+            {data.map((row, rowIndex) => (
+                <Row
+                    key={rowIndex}
+                    row={row}
+                    rowIndex={rowIndex}
+                    columns={columns}
+                    onValueChange={handleValueChange}
+                />
             ))}
             </tbody>
         </table>
