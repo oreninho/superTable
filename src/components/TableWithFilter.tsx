@@ -57,8 +57,6 @@ const TableWithFilter: React.FC<TableWrapperProps> = ({ initialData, columns }) 
                     ))}
                 </div>
             }
-
-
             <Table initialData={initialData} columns={visibleColumns} /> {/* Pass the visible columns as a prop */}
         </div>
     );

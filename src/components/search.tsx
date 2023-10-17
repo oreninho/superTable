@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './search.scss';
 
 interface Props {
-  onClick: () => void;
+  onClick?: () => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
 }

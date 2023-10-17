@@ -12,23 +12,41 @@ const TableWithSearch: React.FC<TableWithSearchProps> = (props, context) => {
 
 
     const scanRow = (row: any,query:string) => {
+        console.log("scanning row",query);
         for (let key in row) {
-            if (row[key].toLowerCase().includes(query.toLowerCase())) {
-                return true;
+            try {
+                let value = row[key];
+                let valueStr = "";
+                if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                    valueStr = value.toString().toLowerCase();
+                } else if (typeof value === 'object') {
+                    // Convert JSON objects to string for searching purposes
+                    valueStr = JSON.stringify(value).toLowerCase();
+                }
+                if (valueStr.includes(query.toLowerCase())) {
+                    return true;
+                }
             }
+            catch (e) {
+                console.log(e, row, key,searchValue);
+            }
+
         }
         return false;
     }
 
-    const applySearch = () => {
+    const applySearch = (event:React.ChangeEvent) => {
+        const target = event.target as HTMLInputElement;
+        setSearchValue(target.value); //todo: a bit odd, go back to this later
         const newFilteredData = filteredData.filter(row =>
             scanRow(row,searchValue)
         );
+        console.log("len b4 and after",newFilteredData.length,filteredData.length);
         setFilteredData(newFilteredData);
     };
     return (
         <div>
-            <Search value={searchValue} onClick={applySearch}/>
+            <Search value={searchValue} onChange={applySearch}/>
             <TableWithFilter {...props} initialData={filteredData}></TableWithFilter>
         </div>
     );
