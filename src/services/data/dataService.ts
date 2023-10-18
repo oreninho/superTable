@@ -1,6 +1,6 @@
 import {ICacheBehavior} from "./types";
 
-class CacheService implements ICacheBehavior {
+class DataService implements ICacheBehavior {
     private _cacheBehavior?: ICacheBehavior;
 
     init(cacheBehavior: ICacheBehavior) {
@@ -23,4 +23,4 @@ class CacheService implements ICacheBehavior {
         this._cacheBehavior!.clear();
     }
 }
-export const cacheService = new CacheService();
+export const dataService = new DataService();

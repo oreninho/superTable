@@ -1,9 +1,9 @@
 import {ICacheBehavior} from "./types";
 
-export class LocalStorageCache implements ICacheBehavior{
+export class LocalStorageBehaviour implements ICacheBehavior{
 
     async get(key: string): Promise<string | null> {
-        console.log('LocalStorageCache get', key);
+        console.log('LocalStorageBehaviour get', key);
         return localStorage.getItem(key);
     }
 

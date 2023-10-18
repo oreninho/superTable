@@ -3,15 +3,15 @@ import Table from './EditableTable';
 import './filterMenu.scss';
 import {TableWithFilterProps} from "./types";
 
-//should I move the interface to a separate file? must it be all the same interface for all relevant tables??
 
-
-const TableWithFilter: React.FC<TableWithFilterProps> = ({ initialData, columns }) => {
+const TableWithFilter: React.FC<TableWithFilterProps> = ({ initialData,columns }) => {
 
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [visibleColumns, setVisibleColumns] = useState(columns);
+
     useEffect(() => {
         console.log('Table component rendered with data:', initialData);
+
     }, [initialData]);
     const handleColumnVisibilityChange = (columnId: string, isVisible: boolean) => {
         const newVisibleColumns = isVisible ?
@@ -19,7 +19,6 @@ const TableWithFilter: React.FC<TableWithFilterProps> = ({ initialData, columns 
             : visibleColumns.filter(column => column.id !== columnId);
 
             if (newVisibleColumns.length === 0 ) {
-                // Prevent hiding all columns
                 return;
             }
             else{

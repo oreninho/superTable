@@ -25,30 +25,34 @@ import Header from './Header';
 import Row from './Row';
 import './editTable.scss';
 import {toCamelCase} from "../services/utils";
-import {TableDataProps} from "./types";
+import {BaseTableDataProps} from "./types";
+import tableDataService from "../services/data/tableDataService";
 
 
 
 
 
 
-const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
+const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) => {
     const [data, setData] = useState(initialData);
     const [sortConfig, setSortConfig] = useState<{ key: string; ascending: boolean } | null>(null);
 
     useEffect(() => {
-        console.log('basic Table component rendered with data:', initialData);
-    },[initialData]);
-    const handleValueChange = (rowIndex: number, columnId: string, newValue: any) => {
+        setData(initialData);
+    }, [initialData]);
+    const handleValueChange = async (rowIndex: number, columnId: string, newValue: any) => {
         // Create a new array with the updated row
         const newData = data.map((row, index) => {
             if (index === rowIndex) {
-                return { ...row, [columnId]: newValue };
+                let updatedRow = {...row, [columnId]: newValue};
+                tableDataService.updateData(updatedRow)
+                return updatedRow;
             }
+
             return row;
         });
-
         setData(newData);
+
     };
 
 
@@ -83,30 +87,33 @@ const EditableTable: React.FC<TableDataProps> = ({ initialData, columns }) => {
     };
 
     return (
-        <table className={"edit-table"}>
-            <thead>
-            <tr>
-                {columns.map(column => (
-                    <Header
-                        key={column.id}
-                        name={column.title}
-                        onRequestSort={(key) => requestSort(key)}
+        <div>
+
+            <table className={"edit-table"}>
+                <thead>
+                <tr>
+                    {columns.map(column => (
+                        <Header
+                            key={column.id}
+                            name={column.title}
+                            onRequestSort={(key) => requestSort(key)}
+                        />
+                    ))}
+                </tr>
+                </thead>
+                <tbody>
+                {data.map((row, rowIndex) => (
+                    <Row
+                        key={rowIndex}
+                        row={row}
+                        rowIndex={rowIndex}
+                        columns={columns}
+                        onValueChange={handleValueChange}
                     />
                 ))}
-            </tr>
-            </thead>
-            <tbody>
-            {data.map((row, rowIndex) => (
-                <Row
-                    key={rowIndex}
-                    row={row}
-                    rowIndex={rowIndex}
-                    columns={columns}
-                    onValueChange={handleValueChange}
-                />
-            ))}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     );
 };
 

@@ -1,19 +1,21 @@
-import React, {useCallback, useEffect, useReducer, useState} from "react";
+import React, {useCallback, useEffect, useReducer, useRef, useState} from "react";
 import {TableWithSearchProps} from "./types";
 import Search from "./search";
 import TableWithFilter from "./TableWithFilter";
 import {debounce} from "lodash";
 
 
-const TableWithSearch: React.FC<TableWithSearchProps> = (props, context) => {
-   // const [searchValue,setSearchValue] = useState(""); //todo? search rows or search columns? from my understanding it should be rows
-    const [filteredData,setFilteredData] = useState(props.initialData);
-        const [, forceUpdate] = useReducer(x => x + 1, 0);
+const TableWithSearch: React.FC<TableWithSearchProps> = ({initialData,columns}, context) => {
+
+    const originalData = useRef(initialData); // Store original data in a ref
+    const [filteredData,setFilteredData] = useState(initialData);
 
     useEffect(() => {
-        console.log('Filtered Data updated:', filteredData);
-        forceUpdate(); //todo:temp should be removed
-    }, [filteredData]);
+        // Update originalData and filteredData when props.initialData changes
+        originalData.current = initialData;
+        setFilteredData(initialData);
+    }, [initialData]);
+
 
 
     const scanRow = (row: any,query:string) => {
@@ -41,7 +43,7 @@ const TableWithSearch: React.FC<TableWithSearchProps> = (props, context) => {
     }
 
     const applySearch = debounce ((query:string) => {
-        const newFilteredData = filteredData.filter(row =>
+        const newFilteredData = originalData.current.filter(row =>
             scanRow(row,query)
         );
         console.log("len b4 and after",newFilteredData.length,filteredData.length);
@@ -51,7 +53,7 @@ const TableWithSearch: React.FC<TableWithSearchProps> = (props, context) => {
     return (
         <div>
             <Search  onChange={applySearch}/>
-            <TableWithFilter {...props} initialData={filteredData}></TableWithFilter>
+            <TableWithFilter  columns={columns} initialData={filteredData}></TableWithFilter>
         </div>
     );
 }

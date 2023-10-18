@@ -10,7 +10,7 @@
     { "id": "state", "ordinalNo": 7, "title": "State", "type": "string" },
     { "id": "country", "ordinalNo": 8, "title": "Country", "type": "string" }
   ],
-  "rows": [
+  "initialData": [
     { "id": "1", "userId": "U001", "userName": "JohnDoe1", "email": "john.doe1@example.com", "age": 25, "jobTitle": "Developer", "city": "City1", "state": "State1", "country": "Country1" },
     { "id": "2", "userId": "U002", "userName": "JohnDoe2", "email": "john.doe2@example.com", "age": 30, "jobTitle": "Designer", "city": "City2", "state": "State2", "country": "Country2" },
     { "id": "3", "userId": "U003", "userName": "JohnDoe3", "email": "john.doe3@example.com", "age": 35, "jobTitle": "Manager", "city": "City3", "state": "State3", "country": "Country3" },
@@ -41,5 +41,7 @@
     { "id": "28", "userId": "U028", "userName": "JohnDoe28", "email": "john.doe28@example.com", "age": 81, "jobTitle": "Developer", "city": "City28", "state": "State28", "country": "Country28" },
     { "id": "29", "userId": "U029", "userName": "JohnDoe29", "email": "john.doe29@example.com", "age": 86, "jobTitle": "Designer", "city": "City29", "state": "State29", "country": "Country29" },
     { "id": "30", "userId": "U030", "userName": "JohnDoe30", "email": "john.doe30@example.com", "age": 91, "jobTitle": "Manager", "city": "City30", "state": "State30", "country": "Country30" }
+
+
   ]
 }
