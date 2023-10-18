@@ -1,10 +1,8 @@
-// FileUploader.tsx
 
 import React, { useCallback } from 'react';
-import { CompleteTableData } from './types'; // Adjust the import according to your file structure
 
 interface FileUploaderProps {
-    onLoadFile: (file: File) => Promise<CompleteTableData>;
+    onLoadFile: (file: File) => Promise<void>;
 }
 
 const FileUploader: React.FC<FileUploaderProps> = ({ onLoadFile }) => {

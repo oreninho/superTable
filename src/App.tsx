@@ -6,9 +6,10 @@ import {dataService} from "./services/data/dataService";
 import {LocalStorageBehaviour} from "./services/data/localStorageBehaviour";
 import tableDataService from "./services/data/tableDataService";
 import {CompleteTableData} from "./components/types";
+import FileUploader from "./components/FileUploader";
 //const data = require('./data/mocked-data.json');
 
-//todo bugs: sort doesn't work on new data
+//todo bugs: sort doesn't work on new data, input field doesn't work on new data from upload, think of thre usecallback in fileruploader
 
 function App() {
 
@@ -45,13 +46,40 @@ function App() {
              fetchData();
         }
     }, [loading]);
+    const loadFile = async (file: File): Promise<CompleteTableData> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const content = event.target?.result as string;
+                    console.log("content", content);
+                    const data = JSON.parse(content) as CompleteTableData;
+                    // Here you would put the data into local storage
+                    await tableDataService.setData(data);
+                    resolve(data);
+                } catch (error) {
+                    reject(`Error parsing file: ${error}`);
+                }
+            };
+            reader.readAsText(file);
+        });
+    };
+
+    const handleFileLoaded = async (file: File) => {
+        try {
+            const data = await loadFile(file);
+            setTableData(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
 
     if (loading) return <div>"Loading..."</div>;
   return (
-
     <div className="App">
       <header className="App-header">
+          <FileUploader onLoadFile={handleFileLoaded}/>
           {<TableWithSearch initialData={tableData.initialData} columns={tableData.columns} />}
       </header>
     </div>
