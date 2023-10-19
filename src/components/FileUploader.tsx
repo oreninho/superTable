@@ -1,5 +1,6 @@
 
 import React, { useCallback } from 'react';
+import {memoize} from "lodash";
 
 interface FileUploaderProps {
     onLoadFile: (file: File) => Promise<void>;
@@ -19,4 +20,4 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onLoadFile }) => {
     return <input type="file" onChange={handleFileChange} />;
 };
 
-export default FileUploader;
+export default memoize(FileUploader);

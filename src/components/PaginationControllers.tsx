@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useMemo} from "react";
 import "./Pagination.scss";
 interface PaginationControllersProps {
     currentPage: number;
@@ -11,7 +11,7 @@ interface PaginationControllersProps {
 const PaginationControllers: React.FC<PaginationControllersProps> = (props) => {
     const {currentPage, totalPageNumbers, onPageNumberClick, onPreviousPageClick, onNextPageClick} = props;
     const jumpValue =  totalPageNumbers > 10 ? 10 : totalPageNumbers;
-    return <div className={"pagination"}>
+    return useMemo(()=> <div className={"pagination"}>
         <button onClick={onPreviousPageClick} disabled={currentPage === 1}>
             Previous
         </button>
@@ -24,6 +24,6 @@ const PaginationControllers: React.FC<PaginationControllersProps> = (props) => {
         <button onClick={onNextPageClick} disabled={currentPage === totalPageNumbers}>
             Next
         </button>
-    </div>
+    </div>,[currentPage,totalPageNumbers])
 }
 export default PaginationControllers;

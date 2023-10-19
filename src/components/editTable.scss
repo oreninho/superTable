@@ -14,6 +14,17 @@
   td{
     text-align: left;
     padding: 0.5rem 0.7rem;
+    input{
+        max-width: 15%;
+        transition-delay: 0.1s;
+        border: none;
+        background-color: white;
+        font-size: 0.9rem;
+        font-family: sans-serif;
+        &:focus{
+            outline: none;
+        }
+    }
   }
 
   tbody tr {

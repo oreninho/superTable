@@ -96,27 +96,30 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
         setTableState(prev => ({...prev, data: newData}));
     };
 
-    const sortData = useMemo(() => {
-        return (data: typeof initialData,sortConfig:{ key: string; ascending: boolean } | null) => {
+    const sortData =  (data: RowsData ,sortConfig:{ key: string; ascending: boolean } | null) => {
             if (sortConfig !== null) {
                  const sorted = [...data].sort((a, b) => {
+                     let prev = a[sortConfig.key];
+                     let next = b[sortConfig.key];
                      //not exactly sure how to sort selection lists
-                     if (typeof a[sortConfig.key] !== 'object') {
-                         if (a[sortConfig.key] < b[sortConfig.key]) {
+                     if (typeof prev !== 'object') {
+                         if (prev < next) {
                              return sortConfig.ascending ? -1 : 1;
                          }
-                         if (a[sortConfig.key] > b[sortConfig.key]) {
+                         if (prev > next) {
                              return !sortConfig.ascending ? 1 : -1;
                          }
                      }
-                    console.log(a[sortConfig.key],b[sortConfig.key])
+                     if (Number(prev) < Number(next)) {
+                            return sortConfig.ascending ? -1 : 1;
+                     }
                     return 0;
                 });
                 setTableState(prevState => ({...prevState, data: sorted}));
                 console.log(sorted);
             }
         };
-    }, []);
+
 
     function groupBy<T extends RowData>(array: T[], key: string): T[] {
         const group = array.reduce((result, currentValue) => {

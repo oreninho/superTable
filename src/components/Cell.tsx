@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {ColumnType} from "./types";
 
 interface ICellProps {
-    value:string;
+    value: ColumnType;
     onValueChange:  (rowIndex: number, columnId: string, newValue: any) => void;
     columnId: string;
     rowIndex: number;
@@ -23,24 +23,17 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
             inputRef.current.focus();
         }
     }, [isEditing]);
-    const handleValidation = (value: string): boolean => {
+    const handleValidation = (value: ColumnType): boolean => {
         // Example: basic validation logic depending on the type
-        if (type === 'number' && isNaN(Number(value))) {
+        if (typeof value === 'number' && isNaN(Number(value))) {
             setError('Please enter a valid number');
             return false;
         }
-        if (type === 'date' && isNaN(Date.parse(value))) {
-            setError('Please enter a valid date');
+        if (typeof value === 'boolean' && typeof value !== 'boolean') {
+            setError('Please enter a valid boolean value');
             return false;
         }
-        if (type === 'text' && value.length < 3) {
-            setError('Please enter at least 3 characters');
-            return false;
-        }
-        if (type === 'boolean' && typeof value !== 'boolean') {
-            setError('this is a boolean field');
-            return false;
-        }
+
         setError(null);
         return true;
     };
@@ -59,13 +52,13 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
             {isEditing ? (
                 <input
                     ref={inputRef}
-                    value={newValue}
+                    value={newValue?.toString()}
                     onChange={(e) => setNewValue(e.target.value)}
                     onBlur={handleBlur}
                 />
             ) : (
                  <span>{value.toString()}</span>
-                //todo selectionList? not fully understood
+                //todo selectionList?
             )}
             {children}
         </td>

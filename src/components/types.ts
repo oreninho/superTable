@@ -1,6 +1,6 @@
 import React, {ReactNode} from "react";
 
-export type ColumnType = string | number | boolean | Date | null | undefined |Selection
+export type ColumnType = string | number | boolean  |Selection
 
 
 export type RowData = {

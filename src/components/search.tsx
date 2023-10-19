@@ -18,9 +18,6 @@ const Search: React.FC<Props> = ({ onClick,value,onChange }) => {
 
   return (
       <div className={"search"}>
-    {/*<button onClick={onClick}>*/}
-    {/*  Search*/}
-    {/*</button>*/}
           <input placeholder={"Search the rows"} value={searchValue}
                  onChange={(event)=>{onInput(event)} }/>
       </div>
