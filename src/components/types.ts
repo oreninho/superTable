@@ -1,10 +1,19 @@
-export type ColumnType = 'text' | 'number' | 'date' | 'boolean' | 'select' | 'multiSelect' | 'custom';
+import React, {ReactNode} from "react";
+
+export type ColumnType = string | number | boolean | Date | null | undefined |Selection
 
 
 export type RowData = {
     id: string
     [columnId: string]: any
+    children?: RowData[]
 }
+
+export type GroupData = {
+    [groupBy:string]: RowData[];
+};
+
+
 export type  ColumnData =  Array<{
     id: string
     ordinalNo: number
@@ -12,6 +21,7 @@ export type  ColumnData =  Array<{
     type: string
     width?: number
 }>
+
 export type RowsData = Array<RowData>
 export interface CompleteTableData{
     columns: ColumnData
@@ -25,9 +35,8 @@ export interface BaseTableDataProps {
 
 }
 
-export interface TableWithFilterProps  extends BaseTableDataProps {
-    //todo? what should be here?
-}
-export interface TableWithSearchProps  extends BaseTableDataProps {
+export interface TableWrapperProps  extends BaseTableDataProps {
+    children?:  ReactNode;
+
     //todo? what should be here?
 }

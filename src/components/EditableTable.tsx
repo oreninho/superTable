@@ -6,40 +6,83 @@
 //on blur + warning on exit - can have a lot of warnings, can be annoying
 
 //how to save locally? redux? context? local storage?
-//redux - overkill
-//local storage - can be dangerous, can be slow, can be annoying
-//context - can be slow, can be annoying
+//redux
+//local storage
+//context
 
 //searching - seems like a simple input with a button - can be done with a simple state - will be composed along with the table
 //what will the search do? filter the data? highlight the data? show only the data? show only the data and hide the rest?,
 // show the entire row of the specific search?
 
-//grouping - the user should be able to group the data by a specific column, the user should be able to ungroup the data
-// todo think about how to group the data
 
 //sorting - the user should be able to sort the data by a specific column, the user should be able to sort the data by multiple columns??
 //how to add the sorting? on click? on hover? on drag? on button? on blur? on enter? on specific button? on specific click?
 // think of trading view - they have a lot of sorting options
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState, useMemo, useEffect, useContext} from 'react';
 import Header from './Header';
 import Row from './Row';
 import './editTable.scss';
 import {toCamelCase} from "../services/utils";
-import {BaseTableDataProps} from "./types";
+import {BaseTableDataProps, RowData, RowsData,} from "./types";
 import tableDataService from "../services/data/tableDataService";
+import PaginationControllers from "./PaginationControllers";
+import {TableContext} from "../services/tableContext";
+
+//component looks a bit messy - maybe split it into smaller components?
 
 
-
-
-
+type EditableTableState = {
+    data: RowsData;
+    page: number;
+    itemsPerPage: number;
+    totalPageNumbers: number;
+    sortConfig: { key: string; ascending: boolean } | null;
+}
 
 const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) => {
-    const [data, setData] = useState(initialData);
-    const [sortConfig, setSortConfig] = useState<{ key: string; ascending: boolean } | null>(null);
+    const initialState: EditableTableState = {
+        data: initialData,
+        page: 1,
+        itemsPerPage: 20,
+        totalPageNumbers: Math.ceil(initialData.length / 20),
+        sortConfig: null,
+    }
+    const [tableState, setTableState] = useState(initialState);
+
+    const { data, page, itemsPerPage, totalPageNumbers, sortConfig } = tableState;
+
+    const indexOfLastItem = page * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
     useEffect(() => {
-        setData(initialData);
-    }, [initialData]);
+       // initialData.sort((a,b) => a.ordinalNo- b.ordinalNo);
+        if (!initialData || initialData.length === 0 || columns.length === 0 ) return;
+        let groups = groupBy(initialData,columns[0].id);
+        const currentItems = groups.slice(indexOfFirstItem, indexOfLastItem);
+        const totalPageNumbers = Math.ceil(groups.length / itemsPerPage);
+        setTableState(prev => ({...prev, data: currentItems, totalPageNumbers}));
+
+    }, [initialData,page,itemsPerPage]);
+
+
+
+// Calculate total pages
+   ;
+    const handleNextPage = () => {
+        if (page < tableState.totalPageNumbers) {
+            setTableState(prev => ({...prev, page: prev.page + 1}));
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (page > 1) {
+            setTableState(prev => ({...prev, page: prev.page - 1}));
+        }
+    };
+
+    const handlePageNumberClick = (pageNumber: number) => {
+        setTableState(prev => ({...prev, page: pageNumber}));
+    };
     const handleValueChange = async (rowIndex: number, columnId: string, newValue: any) => {
         // Create a new array with the updated row
         const newData = data.map((row, index) => {
@@ -48,47 +91,59 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                 tableDataService.updateData(updatedRow)
                 return updatedRow;
             }
-
             return row;
         });
-        setData(newData);
-
+        setTableState(prev => ({...prev, data: newData}));
     };
-
 
     const sortData = useMemo(() => {
         return (data: typeof initialData,sortConfig:{ key: string; ascending: boolean } | null) => {
             if (sortConfig !== null) {
                  const sorted = [...data].sort((a, b) => {
-                    if (a[sortConfig.key] < b[sortConfig.key]) {
-                        return sortConfig.ascending? -1 : 1;
-                    }
-                    if (a[sortConfig.key] > b[sortConfig.key]) {
-                        return !sortConfig.ascending ? 1 : -1;
-                    }
+                     //not exactly sure how to sort selection lists
+                     if (typeof a[sortConfig.key] !== 'object') {
+                         if (a[sortConfig.key] < b[sortConfig.key]) {
+                             return sortConfig.ascending ? -1 : 1;
+                         }
+                         if (a[sortConfig.key] > b[sortConfig.key]) {
+                             return !sortConfig.ascending ? 1 : -1;
+                         }
+                     }
                     console.log(a[sortConfig.key],b[sortConfig.key])
                     return 0;
                 });
-                setData(sorted);
+                setTableState(prevState => ({...prevState, data: sorted}));
                 console.log(sorted);
             }
         };
     }, []);
 
+    function groupBy<T extends RowData>(array: T[], key: string): T[] {
+        const group = array.reduce((result, currentValue) => {
+            const keyValue = String(currentValue[key]);
+
+            if (!result[keyValue]) {
+                result[keyValue] = {...currentValue, children: []};
+            }
+            result[keyValue].children!.push(currentValue);
+            return result;
+        }, {} as Record<string, T>);
+
+        // Return an array of the group objects
+        return Object.values(group);
+    }
     const requestSort = (key: string) => {
         let isAscending = true;
         if (sortConfig && sortConfig.key === key && sortConfig.ascending) {
             isAscending = false;
         }
         key = toCamelCase(key);
-        setSortConfig({ key, ascending:isAscending });
+        setTableState(prevState => ({...prevState, sortConfig: { key, ascending: isAscending }}));
         sortData(data,sortConfig);
-
     };
 
     return (
         <div>
-
             <table className={"edit-table"}>
                 <thead>
                 <tr>
@@ -96,6 +151,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                         <Header
                             key={column.id}
                             name={column.title}
+                            ascending={sortConfig && sortConfig.key === column.id ? sortConfig.ascending : false}
                             onRequestSort={(key) => requestSort(key)}
                         />
                     ))}
@@ -108,13 +164,16 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                         row={row}
                         rowIndex={rowIndex}
                         columns={columns}
+                        children={row.children}
                         onValueChange={handleValueChange}
                     />
                 ))}
                 </tbody>
             </table>
+            <PaginationControllers currentPage={page} totalPageNumbers={totalPageNumbers}
+                                  onPageNumberClick={handlePageNumberClick} onPreviousPageClick={handlePreviousPage} onNextPageClick={handleNextPage} />
         </div>
     );
-};
+}
 
 export default EditableTable;

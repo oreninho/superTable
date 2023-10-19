@@ -1,0 +1,23 @@
+.pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    button{
+        border: none;
+        //background: transparent;
+        //font-size: 1.5rem;
+        cursor: pointer;
+        margin : 0 0.1rem;
+        background-color: #009879;
+        border-radius: 0.3rem;
+        color: snow;
+        &:hover{
+            background-color: #00bfa6;
+        }
+        &:focus{
+            outline: none;
+        }
+    }
+}

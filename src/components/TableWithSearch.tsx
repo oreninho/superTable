@@ -1,21 +1,19 @@
 import React, {useCallback, useEffect, useReducer, useRef, useState} from "react";
-import {TableWithSearchProps} from "./types";
+import {TableWrapperProps} from "./types";
 import Search from "./search";
 import TableWithFilter from "./TableWithFilter";
 import {debounce} from "lodash";
 
 
-const TableWithSearch: React.FC<TableWithSearchProps> = ({initialData,columns}, context) => {
+const TableWithSearch: React.FC<TableWrapperProps> = (props, context) => {
 
-    const originalData = useRef(initialData); // Store original data in a ref
-    const [filteredData,setFilteredData] = useState(initialData);
+    const originalData = useRef(props.initialData); // Store original data in a ref
+    const [filteredData,setFilteredData] = useState(props.initialData);
+
 
     useEffect(() => {
-        // Update originalData and filteredData when props.initialData changes
-        originalData.current = initialData;
-        setFilteredData(initialData);
-    }, [initialData]);
-
+        console.log('Filtered Data updated:', filteredData);
+    }, [filteredData]);
 
 
     const scanRow = (row: any,query:string) => {
@@ -46,14 +44,13 @@ const TableWithSearch: React.FC<TableWithSearchProps> = ({initialData,columns}, 
         const newFilteredData = originalData.current.filter(row =>
             scanRow(row,query)
         );
-        console.log("len b4 and after",newFilteredData.length,filteredData.length);
         setFilteredData(newFilteredData);
     }, 100);
 
     return (
         <div>
             <Search  onChange={applySearch}/>
-            <TableWithFilter  columns={columns} initialData={filteredData}></TableWithFilter>
+            <TableWithFilter  columns={props.columns} initialData={filteredData}></TableWithFilter>
         </div>
     );
 }

@@ -1,17 +1,18 @@
 .edit-table{
   border-collapse: collapse;
-  margin: 25px 0;
   font-size: 0.9em;
   font-family: sans-serif;
   min-width: 400px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   border-spacing: 0.2rem;
+    border-radius: 5rem;
   thead tr{
     background-color: #009879;
     color: #ffffff;
     text-align: left;
   }
   td{
+    text-align: left;
     padding: 0.5rem 0.7rem;
   }
 
@@ -20,7 +21,7 @@
   }
 
   tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
+    background-color: darkblue;
   }
 
    tbody tr:last-of-type {

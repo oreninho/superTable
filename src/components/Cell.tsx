@@ -1,14 +1,16 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {ColumnType} from "./types";
 
 interface ICellProps {
-    value: string;
+    value:string;
     onValueChange:  (rowIndex: number, columnId: string, newValue: any) => void;
     columnId: string;
     rowIndex: number;
-    type?: 'text' | 'number' | 'date';
+    type?: 'text' | 'number' | 'date'|'boolean';
+    children?: React.ReactNode;
 }
 
-const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, type }) => {
+const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, type,children }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newValue, setNewValue] = useState(value);
 
@@ -35,6 +37,10 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
             setError('Please enter at least 3 characters');
             return false;
         }
+        if (type === 'boolean' && typeof value !== 'boolean') {
+            setError('this is a boolean field');
+            return false;
+        }
         setError(null);
         return true;
     };
@@ -58,8 +64,10 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
                     onBlur={handleBlur}
                 />
             ) : (
-                value
+                 <span>{value.toString()}</span>
+                //todo selectionList? not fully understood
             )}
+            {children}
         </td>
     );
 };

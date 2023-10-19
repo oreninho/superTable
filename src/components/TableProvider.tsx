@@ -1,35 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import './App.scss';
+import React, {useContext, useEffect, useState} from 'react';
+import {TableContext} from "../services/tableContext";
+import tableDataService from "../services/data/tableDataService";
+import {CompleteTableData} from "./types";
+import FileUploader from "./FileUploader";
 
-import TableWithSearch from "./components/TableWithSearch";
-import {dataService} from "./services/data/dataService";
-import {LocalStorageBehaviour} from "./services/data/localStorageBehaviour";
-import tableDataService from "./services/data/tableDataService";
-import {ColumnData, CompleteTableData} from "./components/types";
-import FileUploader from "./components/FileUploader";
-import mockData from "./services/mockDataGeneratoe";
-import generateMockData from "./services/mockDataGeneratoe";
-//const data = require('./data/mocked-data.json');
 
-//todo bugs: sort doesn't work on new data, input field doesn't work on new data from upload, think of thre usecallback in fileruploader
+interface TableProviderProps {
 
-function App() {
+    children: React.ReactNode;
+}
 
-    const [tableData,setTableData] = useState<any>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        (async () => {
-            console.log("Initializing session");
-            dataService.init(new LocalStorageBehaviour());
-
-        })();
-    }, []);
-
+const TableProvider: React.FC<TableProviderProps> = ({children }) => {
+    const [tableData, setTableData] = useState<CompleteTableData>({
+        initialData: [],
+        columns: [],
+    });
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const fetchData = async () => {
             try {
-
 
                 const curData = await tableDataService.getData<CompleteTableData>();
                 console.log("curData", curData);
@@ -47,7 +36,7 @@ function App() {
         };
 
         if (loading) {
-             fetchData();
+            fetchData();
         }
     }, [loading]);
     const loadFile = async (file: File): Promise<CompleteTableData> => {
@@ -58,7 +47,6 @@ function App() {
                     const content = event.target?.result as string;
                     console.log("content", content);
                     const data = JSON.parse(content) as CompleteTableData;
-                    // Here you would put the data into local storage
                     await tableDataService.setData(data);
                     resolve(data);
                 } catch (error) {
@@ -77,17 +65,19 @@ function App() {
             console.error(error);
         }
     };
+    return (
 
-
-    if (loading) return <div>"Loading..."</div>;
-  return (
-    <div className="App">
-      <header className="App-header">
-          <FileUploader onLoadFile={handleFileLoaded}/>
-          {<TableWithSearch initialData={tableData.initialData} columns={tableData.columns} />}
-      </header>
-    </div>
-  );
+        <TableContext.Provider value={tableData}>
+            <FileUploader onLoadFile={handleFileLoaded}/>
+            {children}
+        </TableContext.Provider>
+    );
 }
-
-export default App;
+const useTableContext = () => {
+    const context = useContext(TableContext);
+    if (!context) {
+        throw new Error("useTableContext must be used within a TableProvider");
+    }
+    return context;
+};
+export {useTableContext,TableProvider};

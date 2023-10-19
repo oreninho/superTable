@@ -1,18 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Table from './EditableTable';
 import './filterMenu.scss';
-import {TableWithFilterProps} from "./types";
+import {TableWrapperProps} from "./types";
 
 
-const TableWithFilter: React.FC<TableWithFilterProps> = ({ initialData,columns }) => {
+const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns}) => {
+
 
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [visibleColumns, setVisibleColumns] = useState(columns);
 
+
     useEffect(() => {
+        setVisibleColumns(columns);
         console.log('Table component rendered with data:', initialData);
 
-    }, [initialData]);
+    }, [initialData,columns]);
     const handleColumnVisibilityChange = (columnId: string, isVisible: boolean) => {
         const newVisibleColumns = isVisible ?
             [...visibleColumns, columns.find(column => column.id === columnId)]
