@@ -2,7 +2,7 @@
 import React, {memo, useMemo} from 'react';
 import Cell from './Cell';
 import { RowData} from "./types";
-import {FaAngleDown, FaAngleUp} from "react-icons/fa"; // assuming you have these files
+import {FaAngleDown, FaAngleUp} from "react-icons/fa";
 
 export interface RowProps {
     row: RowData ;

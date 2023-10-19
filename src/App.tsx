@@ -58,7 +58,6 @@ function App() {
                     const content = event.target?.result as string;
                     console.log("content", content);
                     const data = JSON.parse(content) as CompleteTableData;
-                    // Here you would put the data into local storage
                     await tableDataService.setData(data);
                     resolve(data);
                 } catch (error) {
