@@ -110,9 +110,6 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                              return !sortConfig.ascending ? 1 : -1;
                          }
                      }
-                     if (Number(prev) < Number(next)) {
-                            return sortConfig.ascending ? -1 : 1;
-                     }
                     return 0;
                 });
                 setTableState(prevState => ({...prevState, data: sorted}));
