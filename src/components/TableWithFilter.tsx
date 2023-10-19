@@ -1,11 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Table from './EditableTable';
 import './filterMenu.scss';
-import {TableWrapperProps} from "./types";
+import {ColumnData, TableWrapperProps} from "./types";
 
 
 const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns}) => {
-
 
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [visibleColumns, setVisibleColumns] = useState(columns);
@@ -21,13 +20,10 @@ const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns}) => 
             [...visibleColumns, columns.find(column => column.id === columnId)]
             : visibleColumns.filter(column => column.id !== columnId);
 
-            if (newVisibleColumns.length === 0 ) {
-                return;
-            }
-            else{
-                // @ts-ignore
-                setVisibleColumns(newVisibleColumns); //todo: check this
-            }
+            //maintain original order
+            newVisibleColumns.sort((a,b) => a!.ordinalNo- b!.ordinalNo);
+            //ts-ignore
+            setVisibleColumns(newVisibleColumns as ColumnData);
 
     };
 
