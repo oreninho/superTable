@@ -70,8 +70,10 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
     useEffect(() => {
+
         if (!initialData || initialData.length === 0 || columns.length === 0 ) return;
-        let groups = groupBy(initialData,columns[0].id);
+
+        let groups =  tableDataService.groupBy(initialData,columns[0].id);
         const currentItems = groups.slice(indexOfFirstItem, indexOfLastItem);
         const totalPageNumbers = Math.ceil(groups.length / itemsPerPage);
         setTableState(prev => ({...prev, tableData: groups, totalPageNumbers}));
@@ -82,7 +84,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     useEffect(() => {
         const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
         setPageState(prev => ({...prev, pageData: currentItems}));
-    }, [tableData,page]);
+    }, [tableData,page,indexOfFirstItem,indexOfLastItem]);
 
     const getOffset = (page: number, itemsPerPage: number) => {
         return (page - 1) * itemsPerPage;
@@ -103,19 +105,36 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     const handlePageNumberClick = (pageNumber: number) => {
         setPageState(prev => ({...prev, page: pageNumber}));
     };
-    const handleValueChange =  async (rowIndex: number, columnId: string, newValue: any) => {
-        // Create a new array with the updated row
-        const newData = pageData.map((row, index) => {
-            let offset = getOffset(page,itemsPerPage);
-            if ((index + offset) === rowIndex) {
-                let updatedRow = {...row, [columnId]: newValue};
-                tableDataService.updateData(updatedRow)
-                return updatedRow;
+
+    const updateRow = async (updatedRow: RowData) => {
+        await tableDataService.updateData(updatedRow);
+        setTableState(prev => ({
+            ...prev,
+            tableData: prev.tableData.map(row => row.id === updatedRow.id ? updatedRow : row)
+        }));
+        setPageState(prev => ({
+            ...prev,
+            pageData: prev.pageData.map(row => row.id === updatedRow.id ? updatedRow : row)
+        }));
+    }
+    const handleValueChange = async (rowId: string, columnId: string, newValue: any) => {
+        for (let row of pageData) {
+            if (row.id === rowId) {
+                const updatedRow = {...row, [columnId]: newValue};
+                await updateRow(updatedRow);
+                return;
             }
-            return row;
-        });
-        setTableState(prev => ({...prev, tableData: newData}));
-        setPageState(prev => ({...prev, pageData: newData}));
+            if (row.children) {
+                for (let i in row.children) {
+                    if (row.children[i].id === rowId) {
+                        const updatedChild = {...row.children[i], [columnId]: newValue};
+                        const updatedRow = {...row, children: row.children.map(child => child.id === rowId ? updatedChild : child)};
+                        await updateRow(updatedRow);
+                        return;
+                    }
+                }
+            }
+        }
     };
 
     //sort the entire data set? or this page only?
@@ -145,22 +164,6 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
         }
     };
 
-
-
-    function groupBy<T extends RowData>(array: T[], key: string): T[] {
-        const group = array.reduce((result, currentValue) => {
-            const keyValue = String(currentValue[key]);
-
-            if (!result[keyValue]) {
-                result[keyValue] = {...currentValue, children: []};
-            }
-            result[keyValue].children!.push(currentValue);
-            return result;
-        }, {} as Record<string, T>);
-
-        // Return an array of the group objects
-        return Object.values(group);
-    }
     const requestSort = (key: string) => {
         key = toCamelCase(key);
 
@@ -180,14 +183,8 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                 <thead>
                 <tr>
                     {columns.map(column => (
-                        <Header
-                            key={column.id}
-                            name={column.title}
-                            id={column.id}
-                            ascending={sortConfig && sortConfig.key === column.id ? sortConfig.ascending : false}
-                            onRequestSort={(key) => requestSort(key)}
-                        />
-                    ))}
+                        <Header key={column.id} name={column.title} id={column.id} ascending={sortConfig && sortConfig.key === column.id ? sortConfig.ascending : false}
+                            onRequestSort={(key) => requestSort(key)}/>))}
                 </tr>
                 </thead>
                 <tbody>
@@ -195,7 +192,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                     <Row
                         key={rowIndex+getOffset(page,itemsPerPage)}
                         row={row}
-                        rowIndex={rowIndex+getOffset(page,itemsPerPage)}
+                        parentRowIndex={rowIndex+getOffset(page,itemsPerPage)}
                         columns={columns}
                         children={row.children}
                         onValueChange={handleValueChange}

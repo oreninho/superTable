@@ -11,7 +11,6 @@ import EditableTable from "./components/EditableTable";
 import TableWithFilter from "./components/TableWithFilter";
 
 
-//todo bugs: sort doesn't work on new data, input field doesn't work on new data from upload, think of thre usecallback in fileruploader
 //todo another dilemma - should the data be streamed or loaded all at once? I think it should be streamed, but then the pagination and sorting will be a bit more complicated
 function App() {
 
@@ -30,8 +29,6 @@ function App() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-
-
                 const curData = await tableDataService.getData<CompleteTableData>();
                 console.log("curData", curData);
 

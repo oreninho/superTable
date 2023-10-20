@@ -1,8 +1,8 @@
 
 // Function to generate mock data
-import {ColumnData, CompleteTableData, RowData} from "../components/types";
+import {ColumnsData, CompleteTableData, RowData} from "../components/types";
 
-const generateMockData = (columns: ColumnData, numberOfRows: number): CompleteTableData => {
+const generateMockData = (columns: ColumnsData, numberOfRows: number): CompleteTableData => {
     const tableData: CompleteTableData = {columns, initialData: []};
     // Helper function to generate random data based on type
     const generateDataByType = (type: string, i: number): any => {

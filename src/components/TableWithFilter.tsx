@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './filterMenu.scss';
-import {ColumnData, TableWrapperProps} from "./types";
+import {ColumnsData, TableWrapperProps} from "./types";
 
 
 const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns,children}) => {
@@ -11,8 +11,6 @@ const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns,child
 
     useEffect(() => {
         setVisibleColumns(columns);
-        console.log('Table component rendered with data:', initialData);
-
     }, [columns]);
 
     useEffect(() => {
@@ -41,7 +39,7 @@ const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns,child
             //maintain original order
             newVisibleColumns.sort((a,b) => a!.ordinalNo- b!.ordinalNo);
 
-            setVisibleColumns(newVisibleColumns as ColumnData);
+            setVisibleColumns(newVisibleColumns as ColumnsData);
     };
 
     return (

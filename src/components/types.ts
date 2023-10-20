@@ -14,7 +14,15 @@ export type GroupData = {
 };
 
 
-export type  ColumnData =  Array<{
+export type ColumnData = {
+    id: string
+    ordinalNo: number
+    title: string
+    type: string
+    width?: number
+}
+
+export type  ColumnsData =  Array<{
     id: string
     ordinalNo: number
     title: string
@@ -24,17 +32,17 @@ export type  ColumnData =  Array<{
 
 export type RowsData = Array<RowData>
 export interface CompleteTableData{
-    columns: ColumnData
+    columns: ColumnsData
     initialData: RowsData
 }
 
 export interface BaseTableDataProps {
-    columns: ColumnData
+    columns: ColumnsData
     initialData: RowsData
     onDataChange?: (data: RowsData ) => void
 
 }
 
 export interface TableWrapperProps  extends BaseTableDataProps {
-    children:  (columns:ColumnData,initialData:RowsData,onDataChange?:(data: RowsData ) => void )=> ReactNode
+    children:  (columns:ColumnsData, initialData:RowsData, onDataChange?:(data: RowsData ) => void )=> ReactNode
 }

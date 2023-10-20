@@ -1,18 +1,20 @@
 
 import React, {useMemo} from 'react';
 import Cell from './Cell';
-import { RowData} from "./types";
+import {ColumnData, ColumnsData, RowData} from "./types";
 import {FaAngleDown, FaAngleUp} from "react-icons/fa";
 
 export interface RowProps {
+
     row: RowData ;
-    rowIndex: number;
-    columns: Array<{ id: string; [key: string]: any }>;
-    onValueChange: (rowIndex: number, columnId: string, newValue: any) => void;
+    parentRowIndex: number;
+    columns: ColumnsData;
+    onValueChange: (rowId: string, columnId: string, newValue: any) => void;
     children?: RowData[];
+    className?: string;
 }
 
-const Row: React.FC<RowProps> = ({ row, rowIndex, columns, onValueChange }) => {
+const Row: React.FC<RowProps> = ({ row, parentRowIndex, columns, onValueChange }) => {
     const [collapsed, setCollapsed] = React.useState(true);
 
     const toggleCollapse = () => {
@@ -25,30 +27,28 @@ const Row: React.FC<RowProps> = ({ row, rowIndex, columns, onValueChange }) => {
                 {  (collapsed ? <FaAngleUp /> : <FaAngleDown />)}
             </span>
 
-
-
     const memoizedCell = useMemo(() => {
-        return columns.map((column, index) => (
+        return (column:ColumnData, index:number) => (
             <Cell
                 key={column.id}
                 value={row[column.id]}
                 columnId={column.id}
-                rowIndex={rowIndex}
+                rowId={row.id}
                 onValueChange={onValueChange}
                 type={column.type}
                 children={index === 0 && row.children && row.children.length >1 ? Switcher : undefined}
             />
-        ))
-    },[row,columns,rowIndex,onValueChange,Switcher])
+        )
+    },[onValueChange,row,Switcher])
     return (
         <>
         <tr >
             {columns.map((column, index) => (
-                memoizedCell[index]
+                memoizedCell(column,index)
             ))}
         </tr>
-        {!collapsed  && row.children?.map((childRow: any, index: number) => (
-            <Row key={index} row={childRow} rowIndex={index} columns={columns} onValueChange={onValueChange} />
+        {!collapsed  && row.children?.map((childRow: RowData, index: number) => (
+            <Row className={"child-row"} key={parentRowIndex+index} row={childRow} parentRowIndex={parentRowIndex+index}  columns={columns} onValueChange={onValueChange} />
         ))}
         </>
     );

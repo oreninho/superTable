@@ -1,16 +1,16 @@
-import React, {memo, useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState} from 'react';
 import {ColumnType} from "./types";
 
 interface ICellProps {
     value: ColumnType;
-    onValueChange:  (rowIndex: number, columnId: string, newValue: any) => void;
+    onValueChange:  (rowId: string, columnId: string, newValue: any) => void;
     columnId: string;
-    rowIndex: number;
-    type?: 'text' | 'number' | 'date'|'boolean';
+    rowId: string;
+    type?: ColumnType;
     children?: React.ReactNode;
 }
 
-const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, type,children }) => {
+const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowId, type,children }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newValue, setNewValue] = useState(value);
 
@@ -48,7 +48,7 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
     const handleBlur = () => {
         setIsEditing(false);
         if (handleValidation(newValue)) {
-            onValueChange(rowIndex,columnId,newValue);
+            onValueChange(rowId,columnId,newValue);
         }else{
             setError("Please enter a valid value")
         }
@@ -72,4 +72,4 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
     );
 };
 
-export default memo(Cell);
+export default Cell;
