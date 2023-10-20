@@ -24,7 +24,7 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
         }
     }, [isEditing]);
     useEffect(() => {
-        console.log("initializing value",value)
+       // console.log("initializing value",value)
         setNewValue(value);
     }, [value]);
     const handleValidation = (value: ColumnType): boolean => {

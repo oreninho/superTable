@@ -7,9 +7,7 @@ import {LocalStorageBehaviour} from "./services/data/localStorageBehaviour";
 import tableDataService from "./services/data/tableDataService";
 import {ColumnData, CompleteTableData} from "./components/types";
 import FileUploader from "./components/FileUploader";
-import mockData from "./services/mockDataGeneratoe";
-import generateMockData from "./services/mockDataGeneratoe";
-//const data = require('./data/mocked-data.json');
+
 
 //todo bugs: sort doesn't work on new data, input field doesn't work on new data from upload, think of thre usecallback in fileruploader
 //todo another dilemma - should the data be streamed or loaded all at once? I think it should be streamed, but then the pagination and sorting will be a bit more complicated

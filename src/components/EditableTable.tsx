@@ -31,27 +31,40 @@ import PaginationControllers from "./PaginationControllers";
 //component looks a bit messy - maybe split it into smaller components?
 
 
-type EditableTableState = {
-    data: RowsData;
-    page: number;
-    itemsPerPage: number;
+type TableState = {
+    tableData: RowsData;
     totalPageNumbers: number;
     sortConfig: { key: string; ascending: boolean } | null;
 }
 
+type PageState = {
+    page: number;
+    itemsPerPage: number;
+    pageData: RowsData;
+}
+
+
 const ITEMS_PER_PAGE = 30;
 
 const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) => {
-    const initialState: EditableTableState = {
-        data: initialData,
+
+    const initialPageState: PageState = {
         page: 1,
         itemsPerPage: ITEMS_PER_PAGE,
+        pageData: [],
+    }
+
+    const initialState: TableState = {
+        tableData: [],
         totalPageNumbers: Math.ceil(initialData.length / ITEMS_PER_PAGE),
         sortConfig: null,
     }
-    const [tableState, setTableState] = useState(initialState);
 
-    const { data, page, itemsPerPage, totalPageNumbers, sortConfig } = tableState;
+    const [tableState, setTableState] = useState(initialState);
+    const [pageState, setPageState] = useState(initialPageState);
+
+    const { tableData,totalPageNumbers, sortConfig } = tableState;
+    const { page, itemsPerPage, pageData } = pageState;
 
     const indexOfLastItem = page * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -61,33 +74,38 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
         let groups = groupBy(initialData,columns[0].id);
         const currentItems = groups.slice(indexOfFirstItem, indexOfLastItem);
         const totalPageNumbers = Math.ceil(groups.length / itemsPerPage);
-        setTableState(prev => ({...prev, data: currentItems, totalPageNumbers}));
+        setTableState(prev => ({...prev, tableData: groups, totalPageNumbers}));
+        setPageState(prev => ({...prev, pageData: currentItems, page}));
 
-    }, [initialData,page,itemsPerPage]);
+    }, [initialData]);
 
+    useEffect(() => {
+        const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
+        setPageState(prev => ({...prev, pageData: currentItems}));
+    }, [tableData,page]);
 
     const getOffset = (page: number, itemsPerPage: number) => {
         return (page - 1) * itemsPerPage;
     }
 
     const handleNextPage = () => {
-        if (page < tableState.totalPageNumbers) {
-            setTableState(prev => ({...prev, page: prev.page + 1}));
+        if (page < totalPageNumbers) {
+            setPageState(prev => ({...prev, page: prev.page + 1}));
         }
     };
 
     const handlePreviousPage = () => {
         if (page > 1) {
-            setTableState(prev => ({...prev, page: prev.page - 1}));
+            setPageState(prev => ({...prev, page: prev.page - 1}));
         }
     };
 
     const handlePageNumberClick = (pageNumber: number) => {
-        setTableState(prev => ({...prev, page: pageNumber}));
+        setPageState(prev => ({...prev, page: pageNumber}));
     };
     const handleValueChange = async (rowIndex: number, columnId: string, newValue: any) => {
         // Create a new array with the updated row
-        const newData = data.map((row, index) => {
+        const newData = pageData.map((row, index) => {
             let offset = getOffset(page,itemsPerPage);
             if ((index + offset) === rowIndex) {
                 let updatedRow = {...row, [columnId]: newValue};
@@ -96,9 +114,11 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
             }
             return row;
         });
-        setTableState(prev => ({...prev, data: newData}));
+        setTableState(prev => ({...prev, tableData: newData}));
+        setPageState(prev => ({...prev, pageData: newData}));
     };
 
+    //sort the entire data set? or this page only?
     const sortData = (data: RowsData, sortConfig: { key: string; ascending: boolean } | null) => {
         if (sortConfig !== null) {
             const sorted:RowData[] = [...data].sort((a, b) => {
@@ -118,9 +138,10 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
 
                 return 0;
             });
-
-            setTableState(prevState => ({ ...prevState, data: sorted }));
-            console.log(sorted);
+            const pageData = sorted.slice(indexOfFirstItem, indexOfLastItem);
+            setTableState(prevState => ({ ...prevState, tableData: sorted }));
+            setPageState(prevState => ({ ...prevState, pageData }));
+            console.log(tableData);
         }
     };
 
@@ -150,7 +171,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
 
         const newSortConfig = { key, ascending: isAscending };
         setTableState(prevState => ({...prevState, sortConfig: newSortConfig }));
-        sortData(data, newSortConfig);
+        sortData(initialData, newSortConfig);
     };
 
     return (
@@ -170,7 +191,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                 </tr>
                 </thead>
                 <tbody>
-                {data.map((row, rowIndex) => (
+                {pageData.map((row, rowIndex) => (
                     <Row
                         key={rowIndex+getOffset(page,itemsPerPage)}
                         row={row}
