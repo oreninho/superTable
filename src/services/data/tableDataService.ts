@@ -17,10 +17,10 @@ class TableDataService {
         }
     }
 
-    private addIdToData(data: RowData[]): RowData[] {
+    private addIdToData(data: any[]): RowData[] {
         return data.map((row, index) => {
-            return {...row, id: String(index)};
-        });
+            return {...row, id: String(index)} ;
+        }) as unknown as RowData[];
     }
 
     async getData<T>(): Promise<T> {
@@ -49,7 +49,13 @@ class TableDataService {
             // If no data was found in the storage, use the mocked data
             console.log('No data found, setting default data.');
             const mockedData = await import( '../../data/mocked-data.json');
-            console.log('mockedData', mockedData);
+            mockedData.default.initialData.map((row, index) => {
+            if (!row.hasOwnProperty( 'id') )
+            {
+                Object.defineProperty(row, 'id', {value: String(index), writable: true, enumerable: true, configurable: true})
+            }
+
+            })
             await this.db.set(TableDataService.TABLE_KEY, JSON.stringify(mockedData.default), 60*60*24);
             return mockedData as T;
 
@@ -60,21 +66,22 @@ class TableDataService {
             return [] as T;
         }
     }
-    async updateData(data:RowData): Promise<boolean> {
-        let {initialData,columns} = await this.getData<CompleteTableData>();
-        let currData = initialData;
-        if (currData) {
-            for (let i = 0; i < currData.length; i++) {
-                if (currData[i].id === data.id) {
-                    if (currData) {
-                        currData[i] = data;
-                        break;
-                    }
+    async updateData(data:RowData,allData:CompleteTableData): Promise<boolean> {
+        const {initialData,columns} = allData;
+        const flatData  = this.flattenGroupedData(initialData); //they both needs to speak the same language
+        const flatRows = this.flattenGroupedData([data]);
+        if (flatData) {
+            for (let i = 0; i < flatData.length; i++) {
+                let flatRow = flatRows.filter((row)=>{
+                    return row.id === flatData[i].id;
+                });
+                if (flatRow.length > 0) {
+                    flatData[i] = flatRow[0];
                 }
             }
         }
 
-        await this.db.set(TableDataService.TABLE_KEY, JSON.stringify({initialData:this.flattenGroupedData(currData),columns}), 60*60*24);
+        await this.db.set(TableDataService.TABLE_KEY, JSON.stringify({initialData:flatData,columns}), 60*60*24);
         return true;
     }
     async setData(data:CompleteTableData): Promise<boolean> {
@@ -107,12 +114,15 @@ class TableDataService {
     //todo - should I make it async?
     flattenGroupedData(groupedData: RowData[]): RowData[] {
         return groupedData.reduce((result, currentValue) => {
-            if (currentValue.children) {
-                result.push(...currentValue.children);
+            // Push the current item without the children field
+            const { children, ...rest } = currentValue;
+            result.push(rest);
+
+            // If there are children, recursively flatten them and append
+            if (children) {
+                result.push(...this.flattenGroupedData(children));
             }
-            else {
-                result.push(currentValue);
-            }
+
             return result;
         }, [] as RowData[]);
     }

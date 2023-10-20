@@ -107,7 +107,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     };
 
     const updateRow = async (updatedRow: RowData) => {
-        await tableDataService.updateData(updatedRow);
+        await tableDataService.updateData(updatedRow,{initialData:tableData, columns});
         setTableState(prev => ({
             ...prev,
             tableData: prev.tableData.map(row => row.id === updatedRow.id ? updatedRow : row)

@@ -23,6 +23,7 @@ const Row: React.FC<RowProps> = ({ row, parentRowIndex, columns, onValueChange }
         }
     };
 
+    //memoized switcher?
     const Switcher = <span onClick={toggleCollapse} style={{ cursor: 'pointer' }}>
                 {  (collapsed ? <FaAngleUp /> : <FaAngleDown />)}
             </span>
@@ -36,7 +37,7 @@ const Row: React.FC<RowProps> = ({ row, parentRowIndex, columns, onValueChange }
                 rowId={row.id}
                 onValueChange={onValueChange}
                 type={column.type}
-                children={index === 0 && row.children && row.children.length >1 ? Switcher : undefined}
+                children={index === 0 && row.children && row.children.length  ? Switcher : undefined}
             />
         )
     },[onValueChange,row,Switcher])
