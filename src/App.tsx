@@ -12,7 +12,7 @@ import generateMockData from "./services/mockDataGeneratoe";
 //const data = require('./data/mocked-data.json');
 
 //todo bugs: sort doesn't work on new data, input field doesn't work on new data from upload, think of thre usecallback in fileruploader
-
+//todo another dilemma - should the data be streamed or loaded all at once? I think it should be streamed, but then the pagination and sorting will be a bit more complicated
 function App() {
 
     const [tableData,setTableData] = useState<any>(null);
@@ -26,6 +26,7 @@ function App() {
         })();
     }, []);
 
+    //todo move to separate component, perhaps the table itself? I think its not the table component concern to load the data
     useEffect(() => {
         const fetchData = async () => {
             try {

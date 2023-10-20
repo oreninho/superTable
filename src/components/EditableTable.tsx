@@ -18,6 +18,7 @@
 //sorting - the user should be able to sort the data by a specific column, the user should be able to sort the data by multiple columns??
 //how to add the sorting? on click? on hover? on drag? on button? on blur? on enter? on specific button? on specific click?
 // think of trading view - they have a lot of sorting options
+//todo - some issues - when handling large data sets, the initial grouping is slow, the sorting is slow, the pagination is slow
 import React, {useState, useMemo, useEffect, useContext} from 'react';
 import Header from './Header';
 import Row from './Row';
@@ -38,12 +39,14 @@ type EditableTableState = {
     sortConfig: { key: string; ascending: boolean } | null;
 }
 
+const ITEMS_PER_PAGE = 30;
+
 const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) => {
     const initialState: EditableTableState = {
         data: initialData,
         page: 1,
-        itemsPerPage: 20,
-        totalPageNumbers: Math.ceil(initialData.length / 20),
+        itemsPerPage: ITEMS_PER_PAGE,
+        totalPageNumbers: Math.ceil(initialData.length / ITEMS_PER_PAGE),
         sortConfig: null,
     }
     const [tableState, setTableState] = useState(initialState);
@@ -96,26 +99,31 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
         setTableState(prev => ({...prev, data: newData}));
     };
 
-    const sortData =  (data: RowsData ,sortConfig:{ key: string; ascending: boolean } | null) => {
-            if (sortConfig !== null) {
-                 const sorted = [...data].sort((a, b) => {
-                     let prev = a[sortConfig.key];
-                     let next = b[sortConfig.key];
-                     //not exactly sure how to sort selection lists
-                     if (typeof prev !== 'object') {
-                         if (prev < next) {
-                             return sortConfig.ascending ? -1 : 1;
-                         }
-                         if (prev > next) {
-                             return !sortConfig.ascending ? 1 : -1;
-                         }
-                     }
-                    return 0;
-                });
-                setTableState(prevState => ({...prevState, data: sorted}));
-                console.log(sorted);
-            }
-        };
+    const sortData = (data: RowsData, sortConfig: { key: string; ascending: boolean } | null) => {
+        if (sortConfig !== null) {
+            const sorted:RowData[] = [...data].sort((a, b) => {
+                let prev = a[sortConfig.key];
+                let next = b[sortConfig.key];
+
+                if (!isNaN(prev) && !isNaN(next)) {
+                    return sortConfig.ascending ? prev - next : next - prev;
+                }
+
+                if (typeof prev === 'string' && typeof next === 'string') {
+                    return sortConfig.ascending ? prev.localeCompare(next) : next.localeCompare(prev);
+                }
+                if (typeof prev === 'boolean' && typeof next === 'boolean') {
+                    return sortConfig.ascending ? Number(prev) - Number(next) : Number(next) - Number(prev);
+                }
+
+                return 0;
+            });
+
+            setTableState(prevState => ({ ...prevState, data: sorted }));
+            console.log(sorted);
+        }
+    };
+
 
 
     function groupBy<T extends RowData>(array: T[], key: string): T[] {
@@ -133,13 +141,16 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
         return Object.values(group);
     }
     const requestSort = (key: string) => {
+        key = toCamelCase(key);
+
         let isAscending = true;
         if (sortConfig && sortConfig.key === key && sortConfig.ascending) {
             isAscending = false;
         }
-        key = toCamelCase(key);
-        setTableState(prevState => ({...prevState, sortConfig: { key, ascending: isAscending }}));
-        sortData(data,sortConfig);
+
+        const newSortConfig = { key, ascending: isAscending };
+        setTableState(prevState => ({...prevState, sortConfig: newSortConfig }));
+        sortData(data, newSortConfig);
     };
 
     return (
@@ -151,6 +162,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                         <Header
                             key={column.id}
                             name={column.title}
+                            id={column.id}
                             ascending={sortConfig && sortConfig.key === column.id ? sortConfig.ascending : false}
                             onRequestSort={(key) => requestSort(key)}
                         />
