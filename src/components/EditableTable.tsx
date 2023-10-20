@@ -26,7 +26,6 @@ import {toCamelCase} from "../services/utils";
 import {BaseTableDataProps, RowData, RowsData,} from "./types";
 import tableDataService from "../services/data/tableDataService";
 import PaginationControllers from "./PaginationControllers";
-import {TableContext} from "../services/tableContext";
 
 //component looks a bit messy - maybe split it into smaller components?
 
@@ -55,7 +54,6 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
     useEffect(() => {
-       // initialData.sort((a,b) => a.ordinalNo- b.ordinalNo);
         if (!initialData || initialData.length === 0 || columns.length === 0 ) return;
         let groups = groupBy(initialData,columns[0].id);
         const currentItems = groups.slice(indexOfFirstItem, indexOfLastItem);
@@ -65,9 +63,10 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     }, [initialData,page,itemsPerPage]);
 
 
+    const getOffset = (page: number, itemsPerPage: number) => {
+        return (page - 1) * itemsPerPage;
+    }
 
-// Calculate total pages
-   ;
     const handleNextPage = () => {
         if (page < tableState.totalPageNumbers) {
             setTableState(prev => ({...prev, page: prev.page + 1}));
@@ -86,7 +85,8 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     const handleValueChange = async (rowIndex: number, columnId: string, newValue: any) => {
         // Create a new array with the updated row
         const newData = data.map((row, index) => {
-            if (index === rowIndex) {
+            let offset = getOffset(page,itemsPerPage);
+            if ((index + offset) === rowIndex) {
                 let updatedRow = {...row, [columnId]: newValue};
                 tableDataService.updateData(updatedRow)
                 return updatedRow;
@@ -163,9 +163,9 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
                 <tbody>
                 {data.map((row, rowIndex) => (
                     <Row
-                        key={rowIndex}
+                        key={rowIndex+getOffset(page,itemsPerPage)}
                         row={row}
-                        rowIndex={rowIndex}
+                        rowIndex={rowIndex+getOffset(page,itemsPerPage)}
                         columns={columns}
                         children={row.children}
                         onValueChange={handleValueChange}
