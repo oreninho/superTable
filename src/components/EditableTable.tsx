@@ -103,7 +103,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     const handlePageNumberClick = (pageNumber: number) => {
         setPageState(prev => ({...prev, page: pageNumber}));
     };
-    const handleValueChange = async (rowIndex: number, columnId: string, newValue: any) => {
+    const handleValueChange =  async (rowIndex: number, columnId: string, newValue: any) => {
         // Create a new array with the updated row
         const newData = pageData.map((row, index) => {
             let offset = getOffset(page,itemsPerPage);

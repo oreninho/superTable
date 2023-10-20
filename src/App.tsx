@@ -5,8 +5,10 @@ import TableWithSearch from "./components/TableWithSearch";
 import {dataService} from "./services/data/dataService";
 import {LocalStorageBehaviour} from "./services/data/localStorageBehaviour";
 import tableDataService from "./services/data/tableDataService";
-import {ColumnData, CompleteTableData} from "./components/types";
+import { CompleteTableData} from "./components/types";
 import FileUploader from "./components/FileUploader";
+import EditableTable from "./components/EditableTable";
+import TableWithFilter from "./components/TableWithFilter";
 
 
 //todo bugs: sort doesn't work on new data, input field doesn't work on new data from upload, think of thre usecallback in fileruploader
@@ -82,7 +84,14 @@ function App() {
     <div className="App">
       <header className="App-header">
           <FileUploader onLoadFile={handleFileLoaded}/>
-          {<TableWithSearch initialData={tableData.initialData} columns={tableData.columns} />}
+          {<TableWithSearch initialData={tableData.initialData} columns={tableData.columns} >
+              {(columns,initialData) =>
+                  <TableWithFilter columns={columns} initialData={initialData}>
+                        {(columns,initialData) =>
+                            <EditableTable columns={columns} initialData={initialData} onDataChange={setTableData}/>}
+                  </TableWithFilter>
+            }
+            </TableWithSearch>}
       </header>
     </div>
   );

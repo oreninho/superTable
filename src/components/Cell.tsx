@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {memo, useEffect, useRef, useState} from 'react';
 import {ColumnType} from "./types";
 
 interface ICellProps {
@@ -23,10 +23,13 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
             inputRef.current.focus();
         }
     }, [isEditing]);
+
     useEffect(() => {
-       // console.log("initializing value",value)
+        console.log("initializing value")
         setNewValue(value);
     }, [value]);
+
+
     const handleValidation = (value: ColumnType): boolean => {
         // Example: basic validation logic depending on the type
         if (typeof value === 'number' && isNaN(Number(value))) {
@@ -69,4 +72,4 @@ const Cell: React.FC<ICellProps> = ({ value, onValueChange, columnId,rowIndex, t
     );
 };
 
-export default Cell;
+export default memo(Cell);

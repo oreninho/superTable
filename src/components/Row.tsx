@@ -1,5 +1,5 @@
 
-import React, {memo, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import Cell from './Cell';
 import { RowData} from "./types";
 import {FaAngleDown, FaAngleUp} from "react-icons/fa";
@@ -25,20 +25,26 @@ const Row: React.FC<RowProps> = ({ row, rowIndex, columns, onValueChange }) => {
                 {  (collapsed ? <FaAngleUp /> : <FaAngleDown />)}
             </span>
 
+
+
+    const memoizedCell = useMemo(() => {
+        return columns.map((column, index) => (
+            <Cell
+                key={column.id}
+                value={row[column.id]}
+                columnId={column.id}
+                rowIndex={rowIndex}
+                onValueChange={onValueChange}
+                type={column.type}
+                children={index === 0 && row.children && row.children.length >1 ? Switcher : undefined}
+            />
+        ))
+    },[row,columns,rowIndex,onValueChange,Switcher])
     return (
         <>
         <tr >
-
             {columns.map((column, index) => (
-                <Cell
-                    key={column.id}
-                    value={row[column.id]}
-                    columnId={column.id}
-                    rowIndex={rowIndex}
-                    onValueChange={onValueChange}
-                    type={column.type}
-                    children={index === 0 && row.children && row.children.length >1 ? Switcher : undefined}
-                />
+                memoizedCell[index]
             ))}
         </tr>
         {!collapsed  && row.children?.map((childRow: any, index: number) => (

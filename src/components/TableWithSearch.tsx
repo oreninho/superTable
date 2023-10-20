@@ -1,7 +1,6 @@
-import React, {useCallback, useEffect, useReducer, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {TableWrapperProps} from "./types";
 import Search from "./search";
-import TableWithFilter from "./TableWithFilter";
 import {debounce} from "lodash";
 
 
@@ -44,13 +43,16 @@ const TableWithSearch: React.FC<TableWrapperProps> = (props, context) => {
         const newFilteredData = originalData.current.filter(row =>
             scanRow(row,query)
         );
+        if (props.onDataChange) {
+            props.onDataChange(newFilteredData);
+        }
         setFilteredData(newFilteredData);
     }, 100);
 
     return (
         <div>
             <Search  onChange={applySearch}/>
-            <TableWithFilter  columns={props.columns} initialData={filteredData}></TableWithFilter>
+            {props.children && props.children(props.columns,filteredData) }
         </div>
     );
 }

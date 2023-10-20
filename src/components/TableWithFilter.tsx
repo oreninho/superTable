@@ -1,10 +1,9 @@
-import React, {useContext, useEffect, useState} from 'react';
-import Table from './EditableTable';
+import React, { useEffect, useState} from 'react';
 import './filterMenu.scss';
 import {ColumnData, TableWrapperProps} from "./types";
 
 
-const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns}) => {
+const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns,children}) => {
 
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [visibleColumns, setVisibleColumns] = useState(columns);
@@ -47,7 +46,7 @@ const TableWithFilter: React.FC<TableWrapperProps> = ({initialData,columns}) => 
                     ))}
                 </div>
             }
-            <Table initialData={initialData} columns={visibleColumns} /> {/* Pass the visible columns as a prop */}
+            {children && children(visibleColumns,initialData) }
         </div>
     );
 };

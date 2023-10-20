@@ -36,7 +36,6 @@ export interface BaseTableDataProps {
 }
 
 export interface TableWrapperProps  extends BaseTableDataProps {
-    children?:  ReactNode;
-
+    children:  (columns:ColumnData,initialData:RowsData,onDataChange?:(data: RowsData ) => void )=> ReactNode
     //todo? what should be here?
 }
