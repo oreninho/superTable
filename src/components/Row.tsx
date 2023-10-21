@@ -4,6 +4,8 @@ import Cell from './Cell';
 import {ColumnData, ColumnsData, RowData} from "./types";
 import {FaAngleDown, FaAngleUp} from "react-icons/fa";
 
+import './editTable.scss';
+
 export interface RowProps {
 
     row: RowData ;
@@ -14,7 +16,7 @@ export interface RowProps {
     className?: string;
 }
 
-const Row: React.FC<RowProps> = ({ row, parentRowIndex, columns, onValueChange }) => {
+const Row: React.FC<RowProps> = ({ row, parentRowIndex, columns, onValueChange,className }) => {
     const [collapsed, setCollapsed] = React.useState(true);
 
     const toggleCollapse = () => {
@@ -43,7 +45,7 @@ const Row: React.FC<RowProps> = ({ row, parentRowIndex, columns, onValueChange }
     },[onValueChange,row,Switcher])
     return (
         <>
-        <tr >
+        <tr className={className} >
             {columns.map((column, index) => (
                 memoizedCell(column,index)
             ))}
