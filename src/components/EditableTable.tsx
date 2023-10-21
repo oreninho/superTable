@@ -72,7 +72,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     useEffect(() => {
 
         if (!initialData || initialData.length === 0 || columns.length === 0 ) return;
-
+        console.log("editable table useEffect, initialData");
         let groups =  tableDataService.groupBy(initialData,columns[0].id);
         const currentItems = groups.slice(indexOfFirstItem, indexOfLastItem);
         const totalPageNumbers = Math.ceil(groups.length / itemsPerPage);

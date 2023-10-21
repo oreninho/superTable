@@ -18,10 +18,35 @@
   color: #61dafb;
 }
 
-input {
-  //padding: 0.5rem;
-  //margin-top: 0.5rem;
+
+.additional-actions{
+  display: flex;
+  border-radius: 1rem;
+  //background-color: #009879;
+  justify-content: space-between;
+  margin: 1rem;
+  button{
+    margin: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #009879;
+    color: white;
+    border: none;
+   // padding: 0.5rem;
+    cursor: pointer;
+    &:hover{
+      background-color: #007a6d;
+    }
+  }
+}
+
+.file-uploader{
+  margin: 1rem;
+  font-size: 1rem;
   border-radius: 0.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  width: 20%;
 }
 
 @keyframes App-logo-spin {

@@ -25,18 +25,7 @@ class TableDataService {
 
     async getData<T>(): Promise<T> {
         try {
-            //exmple of mocked data generation
-            // const columns: ColumnsData = [
-            //     { id: 'name', ordinalNo: 1, title: 'Name', type: 'string', width: 200 },
-            //     { id: 'age', ordinalNo: 2, title: 'Age', type: 'number', width: 100 },
-            //     { id: 'isVerified', ordinalNo: 3, title: 'Verified', type: 'boolean', width: 150 }
-            //
-            //     // ... other columns ...
-            // ];
-            //
-            // const numberOfRows = 2000; // or any large number for stress testing
-            // return generateMockData(columns, numberOfRows) as T;
-
+            // Try to get data from the storage
             let possibleData = await this.db.get(TableDataService.TABLE_KEY);
             // If data exists in the storage, parse and return it
             if (possibleData && possibleData!.length > 8) {
@@ -50,13 +39,12 @@ class TableDataService {
             console.log('No data found, setting default data.');
             const mockedData = await import( '../../data/mocked-data.json');
             mockedData.default.initialData.map((row, index) => {
-            if (!row.hasOwnProperty( 'id') )
-            {
-                Object.defineProperty(row, 'id', {value: String(index), writable: true, enumerable: true, configurable: true})
-            }
-
+                if (!row.hasOwnProperty( 'id') ) {
+                    Object.defineProperty(row, 'id', {value: String(index), writable: true, enumerable: true, configurable: true})
+                }
             })
-            await this.db.set(TableDataService.TABLE_KEY, JSON.stringify(mockedData.default), 60*60*24);
+            //not sure if I should add the data to the storage on this function
+            //await this.db.set(TableDataService.TABLE_KEY, JSON.stringify(mockedData.default), 60*60*24);
             return mockedData as T;
 
         } catch (error) {
@@ -66,6 +54,35 @@ class TableDataService {
             return [] as T;
         }
     }
+
+    async loadFile<T>(file:File): Promise<T> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const content = event.target?.result as string;
+                    const data = JSON.parse(content) as T
+                    resolve(data);
+                } catch (error) {
+                    reject(`Error parsing file: ${error}`);
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    async getMockData<T>(): Promise<T> {
+        const columns: ColumnsData = [
+            { id: 'name', ordinalNo: 1, title: 'Name', type: 'string', width: 200 },
+            { id: 'age', ordinalNo: 2, title: 'Age', type: 'number', width: 100 },
+            { id: 'isVerified', ordinalNo: 3, title: 'Verified', type: 'boolean', width: 150 },
+            { id: 'address', ordinalNo: 4, title: 'Address', type: 'string', width: 300 },
+        ];
+
+        const numberOfRows = 2000; // or any large number for stress testing
+        return generateMockData(columns, numberOfRows) as T;
+    }
+
     async updateData(data:RowData,allData:CompleteTableData): Promise<boolean> {
         const {initialData,columns} = allData;
         const flatData  = this.flattenGroupedData(initialData); //they both needs to speak the same language

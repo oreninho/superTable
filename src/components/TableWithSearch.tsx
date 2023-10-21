@@ -11,8 +11,8 @@ const TableWithSearch: React.FC<TableWrapperProps> = (props, context) => {
 
 
     useEffect(() => {
-        console.log('Filtered Data updated:', filteredData);
-    }, [filteredData]);
+        console.log('Filtered Data updated:', props.initialData);
+    }, [props.initialData]);
 
 
     const scanRow = (row: any,query:string) => {

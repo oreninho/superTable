@@ -31,56 +31,53 @@ function App() {
             try {
                 const curData = await tableDataService.getData<CompleteTableData>();
                 console.log("curData", curData);
-
                 if (!curData || !curData.columns) {
                     throw new Error("No valid data received");
                 }
-
                 console.log("tableData", curData);
                 setLoading(false);
                 setTableData(curData);
+                return curData;
             } catch (e) {
                 setLoading(true);
             }
         };
-
         if (loading) {
              fetchData();
         }
-    }, [loading]);
-    const loadFile = async (file: File): Promise<CompleteTableData> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                try {
-                    const content = event.target?.result as string;
-                    console.log("content", content);
-                    const data = JSON.parse(content) as CompleteTableData;
-                    await tableDataService.setData(data);
-                    resolve(data);
-                } catch (error) {
-                    reject(`Error parsing file: ${error}`);
-                }
-            };
-            reader.readAsText(file);
-        });
-    };
+    }, [loading,tableData]);
+
 
     const handleFileLoaded = async (file: File) => {
         try {
-            const data = await loadFile(file);
+            const data = await tableDataService.loadFile<CompleteTableData>(file);
+            await tableDataService.setData(data)
+            console.log("data from file", data);
             setTableData(data);
         } catch (error) {
             console.error(error);
         }
     };
 
+    const onMockGenerate = async () => {
+        try {
+            const data = await tableDataService.getMockData<CompleteTableData>();
+            console.log("data from file", data);
+            // await tableDataService.setData(data)
+            // setTableData(data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     if (loading) return <div>"Loading..."</div>;
   return (
     <div className="App">
       <header className="App-header">
-          <FileUploader onLoadFile={handleFileLoaded}/>
+          <div className={"additional-actions"}>
+            <FileUploader onLoadFile={handleFileLoaded}/>
+              <button className={""} onClick={onMockGenerate} > Generate Data </button>
+          </div>
           {<TableWithSearch initialData={tableData.initialData} columns={tableData.columns} >
               {(columns,initialData) =>
                   <TableWithFilter columns={columns} initialData={initialData}>

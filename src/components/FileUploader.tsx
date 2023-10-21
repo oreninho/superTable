@@ -17,7 +17,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onLoadFile }) => {
         [onLoadFile]
     );
 
-    return <input type="file" onChange={handleFileChange} />;
+    return <div>
+            Load a file:
+            <input className={"file-uploader"} type="file" onChange={handleFileChange} />
+            </div>;
 };
 
 export default memoize(FileUploader);
