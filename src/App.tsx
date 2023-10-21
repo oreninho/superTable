@@ -53,6 +53,7 @@ function App() {
             const data = await tableDataService.loadFile<CompleteTableData>(file);
             await tableDataService.setData(data)
             console.log("data from file", data);
+            setLoading(false);
             setTableData(data);
         } catch (error) {
             console.error(error);
@@ -70,7 +71,6 @@ function App() {
         }
     }
 
-    if (loading) return <div>"Loading..."</div>;
   return (
     <div className="App">
       <header className="App-header">
@@ -78,7 +78,8 @@ function App() {
             <FileUploader onLoadFile={handleFileLoaded}/>
               <button className={""} onClick={onMockGenerate} > Generate Data </button>
           </div>
-          {<TableWithSearch initialData={tableData.initialData} columns={tableData.columns} >
+            {loading && <div>Loading...</div>}
+          {!loading && <TableWithSearch initialData={tableData.initialData} columns={tableData.columns} >
               {(columns,initialData) =>
                   <TableWithFilter columns={columns} initialData={initialData}>
                         {(columns,initialData) =>

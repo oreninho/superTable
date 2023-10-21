@@ -55,6 +55,7 @@ class TableDataService {
         }
     }
 
+    //should move to a service - fileService
     async loadFile<T>(file:File): Promise<T> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -108,8 +109,8 @@ class TableDataService {
         this.db.set(TableDataService.TABLE_KEY, JSON.stringify(savedData), 60*60*24);
         return true;
     }
-    // need to regroup after main value change?
-    //todo -when editing a child the whole group is change which is a bug
+
+    //todo - is this the correct place for this function?
     groupBy(array: RowData[], key: string): RowData[] {
         const group = array.reduce((result, currentValue,currentIndex) => {
             const keyValue = String(currentValue[key]);
@@ -129,7 +130,7 @@ class TableDataService {
     }
 
     //todo - should I make it async?
-    flattenGroupedData(groupedData: RowData[]): RowData[] {
+    private flattenGroupedData(groupedData: RowData[]): RowData[] {
         return groupedData.reduce((result, currentValue) => {
             // Push the current item without the children field
             const { children, ...rest } = currentValue;

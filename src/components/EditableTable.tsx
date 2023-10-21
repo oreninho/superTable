@@ -82,6 +82,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
     }, [initialData]);
 
     useEffect(() => {
+        console.log("editable table useEffect, page");
         const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
         setPageState(prev => ({...prev, pageData: currentItems}));
     }, [tableData,page,indexOfFirstItem,indexOfLastItem]);
@@ -139,6 +140,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
 
     //sort the entire data set? or this page only?
     const sortData = (data: RowsData, sortConfig: { key: string; ascending: boolean } | null) => {
+        console.log("sortData",data,sortConfig);
         if (sortConfig !== null) {
             const sorted:RowData[] = [...data].sort((a, b) => {
                 let prev = a[sortConfig.key];
@@ -160,7 +162,6 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
             const pageData = sorted.slice(indexOfFirstItem, indexOfLastItem);
             setTableState(prevState => ({ ...prevState, tableData: sorted }));
             setPageState(prevState => ({ ...prevState, pageData }));
-            console.log(tableData);
         }
     };
 
@@ -174,7 +175,7 @@ const EditableTable: React.FC<BaseTableDataProps> = ({ initialData,columns }) =>
 
         const newSortConfig = { key, ascending: isAscending };
         setTableState(prevState => ({...prevState, sortConfig: newSortConfig }));
-        sortData(initialData, newSortConfig);
+        sortData(tableData, newSortConfig);
     };
 
     return (
